@@ -11,9 +11,6 @@ Event::Event(std::string type, std::string payload) {
     m_timestamp = buffer;
 }
 
-//destructor
-Event::~Event() = default;
-
 // getters
 const std::string& Event::GetType() const {
     return m_type;

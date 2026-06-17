@@ -1,12 +1,13 @@
 /* 
 ISubscriber.h 
 Subscriber Interface
-- Pure abstract class
+- Public Pure Abstract class
 - NO driver file
 */
 #ifndef ISUBSCRIBER_H
 #define ISUBSCRIBER_H
 #include "Event.h"
+#include <iostream>
 
 class ISubscriber {
 public:
