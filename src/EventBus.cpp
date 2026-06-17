@@ -1,0 +1,40 @@
+/* EventBus.h */
+#include "EventBus.h"
+
+EventBus::EventBus() = default;
+
+EventBus::~EventBus() = default;
+
+// Subscribe
+// takes an event type and a weak ptr to a subscriber and pushes back into the vector in m_subscribers
+void EventBus::Subscribe(const std::string& eventType, std::weak_ptr<ISubscriber> subscriber) {
+    m_subscribers[eventType].push_back(subscriber);
+}
+
+// Publish
+// takes ownership of an event and notifies all subscribers for that specific event type.
+// takes a unique ptr because only one singular object owns the unique ptr
+void EventBus::Publish(std::unique_ptr<Event> event) {
+    // if a key returns end, the vector at that event is empty, immediately return
+    if(m_subscribers.find(event->GetType()) == m_subscribers.end()) {
+        return;
+    }
+
+    // if the converted weakptr->sharedptr to the subscribers is not null, run oneven
+    for(size_t i = 0; i < m_subscribers[event->GetType()].size(); ++i) {
+        std::shared_ptr<ISubscriber> sharedPtr = m_subscribers[event->GetType()].at(i).lock(); // .lock() converts weak ptrs into shared ptrs
+        if(sharedPtr != nullptr) {
+            sharedPtr->OnEvent(*event);
+        }
+        
+    }
+    
+    // prune expired weak ptrs
+    auto& eventSubs = m_subscribers[event->GetType()]; 
+    eventSubs.erase(
+        // std::remove_if takes in a range, and a lambda to know what to delete
+        std::remove_if(eventSubs.begin(), eventSubs.end(), 
+        // lambda that returns if a weakptr has expired
+        [](const std::weak_ptr<ISubscriber>& weakPtr) {return weakPtr.expired();}
+    ), eventSubs.end());
+}
