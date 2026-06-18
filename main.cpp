@@ -5,7 +5,7 @@
 
 int main() {
     EventBus eventBus;
-    // subscribers
+    // alert version is scoped out so it outputs as intended
     {
         std::shared_ptr<AlertSystem> alerts = std::make_shared<AlertSystem>();
         eventBus.Subscribe("user_connected", std::weak_ptr<ISubscriber>(alerts));
